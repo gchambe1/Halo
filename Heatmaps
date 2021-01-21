@@ -1,6 +1,6 @@
 
 # Should be same as in file setup, use \\ or / not \
-main.folder<-'C:\\Users\\Name\\Desktop\\R project\\Halo\\'
+main.folder<-'C:\\Users\\Desktop\\R project\\Halo\\'
 Player<-'Sooner154'
 game<-'Halo 3'
 
