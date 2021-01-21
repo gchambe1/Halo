@@ -1,0 +1,36 @@
+
+# Should be same as in file setup
+main.folder<-'C:\\Users\\Name\\Desktop\\R project\\Halo\\'
+Player<-'Sooner154'
+game<-'Halo 3'
+
+Influence<-c(3,6,9)
+
+setwd(paste0(main.folder,'\\',Player,'\\',game))
+
+# Install rvest, used for web scraping
+if(!require('rvest')){
+  install.packages('rvest')
+  library('rvest')
+  }
+
+map.names<-c("All Maps","Assembly","Avalanche","Blackout","Citadel","Cold Storage", "Construct"   
+,"Epitaph","Foundry","Ghost Town","Guardian","Heretic","High Ground",  "Isolation"   
+,"Last Resort","Longshore","Narrows","Orbital","Rat's Nest","Sandbox","Sandtrap"    
+,"Snowbound","Standoff","The Pit","Valhalla")
+map.ids<-c("0","490" ,"470", "520", "740" ,"600", "300" ,"350", "480", "590", "320"
+           , "720" ,"310", "330", "30" , "440" ,"380", "500", "580"
+           , "730", "400", "360", "410", "390" ,"340")
+
+wep.id<-c(127,255)
+wep.name<-c('Kills','Deaths')
+
+for(map.num in 2:length(map.names)){
+  for(kd in 1:2){
+for(inf in Influence){
+  url<-paste0("https://halo.bungie.net/stats/Halo3/HeatMap.ashx?player=",Player,"&map=",map.ids[map.num],"&wep=",wep.id[kd],"&inf=",inf)
+  filename<-paste0(map.names[map.num],'\\Heatmap-',wep.name[kd],'-',map.names[map.num],'-',inf,'.jpg')
+download.file(url,filename, mode = 'wb')
+}
+}
+}
