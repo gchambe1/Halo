@@ -9,7 +9,7 @@ Halo2<-F
 
 # Folder where everything will go
 # Use \\ or / not \
-main.folder<-'C:\\Users\\dc49p74\\Desktop\\R project\\Halo\\'
+main.folder<-'C:\\Users\\Name\\Desktop\\R project\\Halo\\'
 
 # Sets main.folder as working directory
 setwd(main.folder)
