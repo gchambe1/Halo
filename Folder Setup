@@ -9,7 +9,7 @@ Halo2<-F
 
 # Folder where everything will go
 # Use \\ or / not \
-main.folder<-'C:\\Users\\Name\\Desktop\\R project\\Halo\\'
+main.folder<-'C:\\Users\\Desktop\\R project\\Halo\\'
 
 # Sets main.folder as working directory
 setwd(main.folder)
@@ -35,4 +35,7 @@ create.folders<-function(maps,gametypes){
     })
 }
 
-if(Halo3){create.folders(halo.3.maps,halo.3.gametypes)}
+if(Halo3){
+  dir.create('Halo 3')
+  create.folders(paste0('Halo 3\\',halo.3.maps),halo.3.gametypes)
+  }
