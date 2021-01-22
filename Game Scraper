@@ -1,0 +1,131 @@
+
+# Choose Player and Folder (should be same as in File Setup code)
+Player<-'Nacho Bonanas'
+Game<-'Halo 3'
+Folder<-'C:\\Users\\Desktop\\R project\\Halo'
+
+# Load required packages (install if not loaded)
+if(!require("rvest")){install.packages("rvest")
+  library("rvest")}
+if(!require("tidyverse")){install.packages("tidyverse")
+  library("tidyverse")}
+if(!require("lubridate")){install.packages("lubridate")
+  library("lubridate")}
+if(!require("rlist")){install.packages("rlist")
+  library("rlist")}
+`%notin%` <- Negate(`%in%`)
+setwd(paste(Folder,Player,Game,sep = '\\'))
+
+if(getwd()!=paste(Folder,Player,Game,sep = '\\')){message('ERROR: Make sure files and initial parameters are set up correctly')}else{
+  player.web<-str_replace_all(Player,' ','+')
+  
+  # Determine how many game pages exist
+  pages<-c()
+  message('Finding how many pages of games exist')
+  while (length(pages)<1){
+    game.list.main<-read_html(paste0('https://halo.bungie.net/Stats/PlayerStatsHalo3.aspx?player=',player.web)) 
+    pages<-game.list.main %>% html_nodes('.rgInfoPart') %>% html_text()
+  }
+  pages<-as.integer(substr(pages[1],str_locate(pages[1],"in ")[2]+1, str_locate(pages[1]," pa")[1]-1))
+  all.game.ids<-vector('list',pages)
+  
+  # Scrape game ids from game pages
+  message('Scraping Game IDs from pages')
+  for (p in 1:pages){
+    cleaned<-c()
+    while (length(cleaned)==0){
+      print(paste('Attempting page',p,'of',pages))
+      game.list.page<-read_html(paste0('https://halo.bungie.net/stats/playerstatshalo3.aspx?player=',player.web,'&ctl00_mainContent_bnetpgl_recentgamesChangePage=',p)) 
+      game.list.rows<-game.list.page %>%
+        html_nodes(".rgRow") %>%
+        html_nodes("a") %>%
+        html_attr("href")
+      game.list.alt.rows<-game.list.page %>%
+        html_nodes(".rgAltRow") %>%
+        html_nodes("a") %>%
+        html_attr("href")
+      both.rows<-c(game.list.rows,game.list.alt.rows)
+      cleaned<-substr(both.rows,str_locate(both.rows,'gameid=')[,2]+1,str_locate(both.rows,'&')-1)
+    }
+    all.game.ids[[p]]<-cleaned[!is.na(cleaned)]
+  }
+  game.ids<-unlist(all.game.ids)
+  
+  # Scrape game info for each game id
+  games<-vector(mode = 'list',length =length(game.ids))
+  message('Scraping game summary for each Game ID')
+  for (i in 1:length(game.ids)){
+    summary<-c()
+    while (length(summary)<1){
+      game.current<-read_html(paste0('https://halo.bungie.net/Stats/GameStatsHalo3.aspx?gameid=',game.ids[i]))
+      summary<-game.current %>% html_nodes('.summary') %>%
+        html_text() %>% 
+        str_split(pattern = '\r\n') %>% unlist() %>% trimws()
+      if(length(summary)>0){
+        stats<-game.current %>% html_nodes('.stats') %>%
+          html_text() %>% 
+          str_split(pattern = '\r\n')
+        game.one.stats<-trimws(str_remove_all(stats[[2]],"\\+"))
+        game.one.stats<-game.one.stats[game.one.stats!='']
+        game.one.stats<-game.one.stats[9:length(game.one.stats)]
+        games[[i]]<-list(summary[c(1,3,4)],game.one.stats,game.ids[i])
+      }
+    }
+    print(paste(i,'of',length(game.ids),'-',summary[1]))
+  }
+  
+  # Save game list as R file
+  games<-list.save(games,'Halo 3 multiplayer games.rds')
+  
+  # Setup to reformat list into big data frame, one row per player per game
+  team.colors<-c('Red','Blue','Orange','Green','Purple','Pink','Yellow')
+  team.names<-paste(team.colors,'Team')
+  base.game.df<-as.data.frame(matrix(ncol=17,nrow = 0))
+  colnames(base.game.df)<-c("Players","Rank","Kills","Assists","Deaths","K/D Spread","Suicides","Betrayals","Score","Team","Team.Kills","Team.Assists","Team.Deaths","Team.K/D Spread","Team.Suicides","Team.Betrayals","Team.Score")
+  
+  extract.game.info<-function(num){
+    summary<-games[[num]][[1]]
+    stats<-games[[num]][[2]]
+    character.loc<-(1:length(stats))[grepl('[a-zA-Z]',stats)]
+    if (length(character.loc)==2){character.loc<-c(character.loc,length(stats)+1)}
+    if(character.loc[3]-character.loc[2]==8){Ranked<-F}else{Ranked<-T}
+    to.df<-stats
+    if(to.df[1] %in% team.names){FFA<-F}else{FFA<-T}
+    while(length(to.df)>2){
+      if (to.df[1] %in% team.names){
+        current.team<-to.df[1:8]
+        to.df<-to.df[9:length(to.df)]
+      }else{
+        current.player<-to.df[1:(8+Ranked)]
+        if(FFA){
+          if(Ranked){
+            current.team<-current.player[c(1,3:9)]
+          }else{
+            current.team<-current.player
+          }
+        }
+        if(!Ranked){current.player<-c(current.player[1],NA,current.player[2:8])}
+        new.row<-as.data.frame(matrix(c(current.player,current.team),ncol=17,nrow = 1))
+        colnames(new.row)<-c("Players","Rank","Kills","Assists","Deaths","K/D Spread","Suicides","Betrayals","Score","Team","Team.Kills","Team.Assists","Team.Deaths","Team.K/D Spread","Team.Suicides","Team.Betrayals","Team.Score")
+        base.game.df<-rbind(base.game.df,new.row)
+        to.df<-to.df[(9+Ranked):length(to.df)]
+      }
+    }
+    base.game.df$Map<-substr(summary[1], str_locate(summary[1],' on ')[2]+1,nchar(summary[1]))
+    base.game.df$Gametype<-substr(summary[1],1, str_locate(summary[1],' on ')[1]-1)
+    base.game.df$Playlist<-substr(summary[2], str_locate(summary[2],' - ')[2]+1,nchar(summary[2]))
+    base.game.df$Date.time<-parse_date_time(summary[3], '%m/%d/%y, %I:%M %p')
+    base.game.df$Game.ID<-games[[num]][[3]]
+    base.game.df$Ranked<-Ranked
+    base.game.df$FFA<-FFA
+    return(base.game.df)
+  }
+  
+  # Turn all games into a data frame and save as csv
+  all.games.df<-extract.game.info(1)
+  for (l in 2:length(games)){
+    all.games.df<-rbind(extract.game.info(l),all.games.df)
+    if(l%%50==0){print(l)}
+  }
+  write.csv(all.games.df, 'Halo 3 Multiplayer Games All.csv')
+}
