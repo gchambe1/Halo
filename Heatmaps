@@ -1,6 +1,6 @@
 
 
-main.folder<-'C:\\Users\\DC49P74\\Desktop\\R project\\Halo\\'
+main.folder<-'C:\\Users\\Desktop\\R project\\Halo\\'
 Player<-'Nacho Bonanas'
 game<-'Halo 3'
 Influence<-c(3,6,9)
