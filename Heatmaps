@@ -5,9 +5,9 @@ Player<-'Nacho Bonanas'
 game<-'Halo 3'
 Influence<-c(3,6,9)
 
-setwd(paste0(main.folder,'\\',Player,'\\',game))
+setwd(paste0(main.folder,'/',Player,'/',game))
 
-if(getwd()!=paste(Folder,Player,Game,sep = '\\')){message('ERROR: Make sure files and initial parameters are set up correctly')}else{
+if(getwd()!=paste(Folder,Player,Game,sep = '/')){message('ERROR: Make sure files and initial parameters are set up correctly')}else{
 
 # Install rvest, used for web scraping
 if(!require('rvest')){
