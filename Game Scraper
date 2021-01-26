@@ -2,7 +2,7 @@
 # Choose Player and Folder (should be same as in File Setup code)
 Player<-'Nacho Bonanas'
 Game<-'Halo 3'
-Folder<-'C:\\Users\\Desktop\\R project\\Halo'
+Folder<-'C:/Users/Desktop/R project/Halo'
 
 # Load required packages (install if not loaded)
 if(!require("rvest")){install.packages("rvest")
@@ -14,9 +14,9 @@ if(!require("lubridate")){install.packages("lubridate")
 if(!require("rlist")){install.packages("rlist")
   library("rlist")}
 `%notin%` <- Negate(`%in%`)
-setwd(paste(Folder,Player,Game,sep = '\\'))
+setwd(paste(Folder,Player,Game,sep = '/'))
 
-if(getwd()!=paste(Folder,Player,Game,sep = '\\')){message('ERROR: Make sure files and initial parameters are set up correctly')}else{
+if(getwd()!=paste(Folder,Player,Game,sep = '/')){message('ERROR: Make sure files and initial parameters are set up correctly')}else{
   player.web<-str_replace_all(Player,' ','+')
   
   # Determine how many game pages exist
