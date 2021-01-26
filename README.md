@@ -12,8 +12,11 @@ For Halo 3 (first game), I am thinking 3 files for multiplayer: One for summary 
 Initial focus is just on scraping, with follow up codes for cleaning and visualization.
 
 Current codes:
+
 H3 Multiplayer Scraper
+
 H3 Custom Game Scraper
+
 H3 Heatmap Scraper
 
 
