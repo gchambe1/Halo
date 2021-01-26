@@ -8,8 +8,8 @@ Halo3<-T
 Halo2<-F
 
 # Folder where everything will go
-# Use \\ or / not \
-main.folder<-'C:\\Users\\Desktop\\R project\\Halo\\'
+# Use / not \
+main.folder<-'C:/Users/Desktop/R project/Halo/'
 
 # Sets main.folder as working directory
 setwd(main.folder)
@@ -18,7 +18,7 @@ setwd(main.folder)
 dir.create(gamertag)
 
 # Resets working directory to be gamertag folder
-setwd(paste0(main.folder,'\\',gamertag))
+setwd(paste0(main.folder,'/',gamertag))
 
 # List of maps and game types
 halo.3.maps<-c("All Maps","Assembly","Avalanche","Blackout","Citadel","Cold Storage"
@@ -31,11 +31,11 @@ halo.3.gametypes<-c('All','Slayer','Oddball','King','Juggernaut', 'Infection', '
 create.folders<-function(maps,gametypes){
   sapply(maps, function(m){
     dir.create(m)
-    sapply(gametypes, function(gt) dir.create(paste0(m,'\\',gt)))
+    sapply(gametypes, function(gt) dir.create(paste0(m,'/',gt)))
     })
 }
 
 if(Halo3){
   dir.create('Halo 3')
-  create.folders(paste0('Halo 3\\',halo.3.maps),halo.3.gametypes)
+  create.folders(paste0('Halo 3/',halo.3.maps),halo.3.gametypes)
   }
