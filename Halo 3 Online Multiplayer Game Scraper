@@ -1,7 +1,7 @@
-
-# Choose Player and Folder (should be same as in File Setup code)
-Player<-'Nacho Bonanas'
-Game<-'Halo 3'
+# RUN FILE SETUP FIRST
+# Choose Player, Game and Folder (should be same as in File Setup code)
+Player<-'sooner1543'
+Game<-'Halo 2'
 Folder<-'C:/Users/Desktop/R project/Halo'
 
 # Load required packages (install if not loaded)
@@ -18,12 +18,12 @@ setwd(paste(Folder,Player,Game,sep = '/'))
 
 if(getwd()!=paste(Folder,Player,Game,sep = '/')){message('ERROR: Make sure files and initial parameters are set up correctly')}else{
   player.web<-str_replace_all(Player,' ','+')
-  
+  game.web<-str_replace_all(Game,' ','')
   # Determine how many game pages exist
   pages<-c()
   message('Finding how many pages of games exist')
   while (length(pages)<1){
-    game.list.main<-read_html(paste0('https://halo.bungie.net/Stats/PlayerStatsHalo3.aspx?player=',player.web)) 
+    game.list.main<-read_html(paste0('https://halo.bungie.net/Stats/PlayerStats',game.web,'.aspx?player=',player.web)) 
     pages<-game.list.main %>% html_nodes('.rgInfoPart') %>% html_text()
   }
   pages<-as.integer(substr(pages[1],str_locate(pages[1],"in ")[2]+1, str_locate(pages[1]," pa")[1]-1))
@@ -35,7 +35,7 @@ if(getwd()!=paste(Folder,Player,Game,sep = '/')){message('ERROR: Make sure files
     cleaned<-c()
     while (length(cleaned)==0){
       print(paste('Attempting page',p,'of',pages))
-      game.list.page<-read_html(paste0('https://halo.bungie.net/stats/playerstatshalo3.aspx?player=',player.web,'&ctl00_mainContent_bnetpgl_recentgamesChangePage=',p)) 
+      game.list.page<-read_html(paste0('https://halo.bungie.net/stats/playerstats',game.web,'.aspx?player=',player.web,'&ctl00_mainContent_bnetpgl_recentgamesChangePage=',p)) 
       game.list.rows<-game.list.page %>%
         html_nodes(".rgRow") %>%
         html_nodes("a") %>%
@@ -57,7 +57,7 @@ if(getwd()!=paste(Folder,Player,Game,sep = '/')){message('ERROR: Make sure files
   for (i in 1:length(game.ids)){
     summary<-c()
     while (length(summary)<1){
-      game.current<-read_html(paste0('https://halo.bungie.net/Stats/GameStatsHalo3.aspx?gameid=',game.ids[i]))
+      game.current<-read_html(paste0('https://halo.bungie.net/Stats/GameStats',game.web,'.aspx?gameid=',game.ids[i]))
       summary<-game.current %>% html_nodes('.summary') %>%
         html_text() %>% 
         str_split(pattern = '\r\n') %>% unlist() %>% trimws()
@@ -75,7 +75,7 @@ if(getwd()!=paste(Folder,Player,Game,sep = '/')){message('ERROR: Make sure files
   }
   
   # Save game list as R file
-  games<-list.save(games,'Halo 3 multiplayer games.rds')
+  list.save(games,paste(Game,' Multiplayer Games.rds'))
   
   # Setup to reformat list into big data frame, one row per player per game
   team.colors<-c('Red','Blue','Orange','Green','Purple','Pink','Yellow')
@@ -127,5 +127,5 @@ if(getwd()!=paste(Folder,Player,Game,sep = '/')){message('ERROR: Make sure files
     all.games.df<-rbind(extract.game.info(l),all.games.df)
     if(l%%50==0){print(l)}
   }
-  write.csv(all.games.df, 'Halo 3 Multiplayer Games All.csv')
+  write.csv(all.games.df, paste(Game,' Multiplayer Games All.csv'))
 }
