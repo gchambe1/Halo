@@ -13,7 +13,7 @@ Initial focus is just on scraping, with follow up codes for cleaning and visuali
 
 Current codes:
 
-H3 Multiplayer Scraper
+H2/H3 Multiplayer Scraper - run once for each game
 
 H3 Custom Game Scraper
 
