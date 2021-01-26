@@ -1,11 +1,11 @@
 
 # Gamertag that will be used
-gamertag<-'Sooner154'
+gamertag<-'sooner1543'
 
 # Set each game you want folders for to T or TRUE
 # Only works for Halo 3
 Halo3<-T
-Halo2<-F
+Halo2<-T
 
 # Folder where everything will go
 # Use / not \
@@ -27,6 +27,11 @@ halo.3.maps<-c("All Maps","Assembly","Avalanche","Blackout","Citadel","Cold Stor
                 ,"Sandtrap","Snowbound","Standoff","The Pit","Valhalla")
 halo.3.gametypes<-c('All','Slayer','Oddball','King','Juggernaut', 'Infection', 'Ctf','TeamSlayer','TeamOddball','TeamKing','Vip','Territories','Assault')
 
+halo.2.maps<-c("All Maps","Ascension","Backwash","Beaver Creek","Burial Mounds","Coagulation"
+               ,"Colossus","Containment","Desolation","District","Elongation","Foundation","Gemini" 
+               ,"Headlong","Ivory Tower","Lockout","Midship","Relic","Sanctuary","Terminal"     
+               ,"Tombstone","Turf","Warlock","Waterworks","Zanzibar")
+
 # Function that will create folders and subfolders for maps and gametypes
 create.folders<-function(maps,gametypes){
   sapply(maps, function(m){
@@ -39,3 +44,15 @@ if(Halo3){
   dir.create('Halo 3')
   create.folders(paste0('Halo 3/',halo.3.maps),halo.3.gametypes)
   }
+
+if(Halo2){
+  dir.create('Halo 2')
+  create.folders(paste0('Halo 2/',halo.2.maps),'Ignore')
+}
+
+
+
+
+
+
+
