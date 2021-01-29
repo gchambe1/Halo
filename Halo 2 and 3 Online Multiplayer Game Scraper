@@ -1,5 +1,5 @@
-# RUN FILE SETUP FIRST
-# Choose Player, Game and Folder (should be same as in File Setup code)
+
+# Choose Player and Folder (should be same as in File Setup code)
 Player<-'sooner1543'
 Game<-'Halo 2'
 Folder<-'C:/Users/Desktop/R project/Halo'
@@ -82,17 +82,20 @@ if(getwd()!=paste(Folder,Player,Game,sep = '/')){message('ERROR: Make sure files
   team.names<-paste(team.colors,'Team')
   base.game.df<-as.data.frame(matrix(ncol=17,nrow = 0))
   colnames(base.game.df)<-c("Players","Rank","Kills","Assists","Deaths","K/D Spread","Suicides","Betrayals","Score","Team","Team.Kills","Team.Assists","Team.Deaths","Team.K/D Spread","Team.Suicides","Team.Betrayals","Team.Score")
-  
+
   extract.game.info<-function(num){
     summary<-games[[num]][[1]]
     stats<-games[[num]][[2]]
+    stats[stats=='N/A']<-"0"
     character.loc<-(1:length(stats))[grepl('[a-zA-Z]',stats)]
     if (length(character.loc)==2){character.loc<-c(character.loc,length(stats)+1)}
     if(character.loc[3]-character.loc[2]==8){Ranked<-F}else{Ranked<-T}
+    if(grepl('Clanmatch',summary[2])){clan<-T}else{clan<-F}
     to.df<-stats
-    if(to.df[1] %in% team.names){FFA<-F}else{FFA<-T}
+    if(to.df[1] %in% team.names|clan){FFA<-F}else{FFA<-T}
     while(length(to.df)>2){
-      if (to.df[1] %in% team.names){
+      if(clan&length(to.df)>9){char.clan.check<-(1:length(to.df))[grepl('[a-zA-Z]',to.df)]}else{char.clan.check<-c(0,9)}
+      if (to.df[1] %in% team.names|(clan&char.clan.check[2]-char.clan.check[1]!=9)){
         current.team<-to.df[1:8]
         to.df<-to.df[9:length(to.df)]
       }else{
@@ -129,3 +132,4 @@ if(getwd()!=paste(Folder,Player,Game,sep = '/')){message('ERROR: Make sure files
   }
   write.csv(all.games.df, paste(Game,' Multiplayer Games All.csv'))
 }
+
